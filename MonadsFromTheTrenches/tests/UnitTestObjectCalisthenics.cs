@@ -4,16 +4,15 @@ namespace MonadsFromTheTrenches;
 
 public class UnitTestObjectCalisthenics
 {        // on veux lire un fichier CSV dans lequel il y a des dates
-         
          // dans une des colonnes, ily a peut une valeur vide
-         
          // et peut etre aussi des valeurs invalides
     [Fact]
     public void ReadOneMovieFromRawString_HappyPath()
     {
         // Arrange
-        // 
-        IMovieReader sut = new FakeReader(oneLine: new List<string> { "Batman Dark Night", "5", "2008-07-18" });
+        var fakeReader = new FakeStringLineReader();
+        fakeReader.Add(oneLine: new List<string> { "Batman Dark Night", "5", "2008-07-18" });
+        IMovieReader sut = new TransformInputToMovieReview(fakeReader);
 
         // Act
         IEnumerable<MovieReview>  result = sut.ReadMovies();
@@ -30,8 +29,9 @@ public class UnitTestObjectCalisthenics
     public void ReadOneMovieFromRawString_UnHappyPath_MissingTitle()
     {
         // Arrange
-        
-        IMovieReader sut = new FakeReader(oneLine: new List<string> { null, "5", "2008-07-18" });
+        var fakeReader = new FakeStringLineReader();
+        fakeReader.Add(oneLine: new List<string> { null, "5", "2008-07-18" });
+        IMovieReader sut = new TransformInputToMovieReview(fakeReader);
 
         // Act
         IEnumerable<MovieReview>  result = sut.ReadMovies();
