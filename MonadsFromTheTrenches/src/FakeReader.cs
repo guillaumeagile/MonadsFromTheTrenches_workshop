@@ -25,4 +25,9 @@ public class FakeReader : IMovieReader
         
         return result;
     }
+
+    public IEnumerable<MonadicMovieReview> ReadMoviesMondiac()
+    {
+        throw new NotImplementedException();
+    }
 }
