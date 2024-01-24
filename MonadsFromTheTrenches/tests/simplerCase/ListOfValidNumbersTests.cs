@@ -83,4 +83,10 @@ public class ListOfValidNumbersTests
     // de MAP
     // puis de BIND /FLATMAP
     // et de REDUCE
+    
+    
+    // TODO ++ = et examiner le Either  : Erreur ou Valide ?
+    // on veut savoir la nature de l'erreur: chaine vide? ou chaine invalide?
+    
+    // TODO +++ =  montrer la Validation 
 }
