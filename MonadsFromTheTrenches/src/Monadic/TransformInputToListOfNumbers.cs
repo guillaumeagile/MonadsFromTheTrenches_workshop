@@ -23,8 +23,9 @@ public class TransformInputToListOfNumbers
        var seq =  thatList.ToSeq();
        var res =  seq.Map(transformStringIntoOptionOfInt);
        return res.ToImmutableList();
-       
     }
+    // TODO: on pourra  faire un exemple de Closure et Currying, peut être plus tard
+    //  
 
     private static Option<int> transformStringIntoOptionOfInt(string item)
     {

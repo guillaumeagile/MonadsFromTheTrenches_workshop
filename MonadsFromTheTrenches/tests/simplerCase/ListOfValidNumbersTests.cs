@@ -78,8 +78,7 @@ public class ListOfValidNumbersTests
         expected.Last().IfSome(x => x.Should().Be(3));
     }
     
-    
-    // TODO: que faire (de pratique) avec une liste de Monad qui contient et des NONE et des SOME ?
+    // TODO NEXT: que faire (de pratique) avec une liste de Monad qui contient et des NONE et des SOME ?
     //  exemple de FILTER
     // de MAP
     // puis de BIND /FLATMAP
