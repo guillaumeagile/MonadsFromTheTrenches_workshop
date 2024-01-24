@@ -14,7 +14,14 @@ public class TransformInputToListOfNumbers
     {
         return thatList
             .Select(item =>
-                    int.TryParse(item, out var value) ? Option<int>.Some(value) : Option<int>.None)
+                    transformStringIntoOptionOfInt(item))
             .ToImmutableList();
     }
+
+    private static Option<int> transformStringIntoOptionOfInt(string item)
+    {
+        return int.TryParse(item, out var value) ? Option<int>.Some(value) : Option<int>.None;
+    }
+    // DISCUSSION: Make Illegal States Unrepresentable!
+    // Always Valid Pattern
 }
