@@ -16,11 +16,7 @@ public class TransformInputToListOfNumbers
 
         foreach (var item in thatList)
         {
-            var result = int.TryParse(item, out var value);
-            if (result)
-                temp.Add(Option<int>.Some(value));
-            else
-                temp.Add(Option<int>.None);
+            temp.Add(int.TryParse(item, out var value) ? Option<int>.Some(value) : Option<int>.None);
         }
 
         // thatList.Select( str =>  procedure(str))
