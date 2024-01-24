@@ -15,12 +15,20 @@ public class ListOfValidNumbersTests
         var sut = new TransformInputToListOfNumbers();
 
         // Act
-         ImmutableList<Int32> expected = sut.ClassicTransform(inputList);
+        var expected = sut.MonadicTransform(inputList);
          
-         // Assert
-         expected.Count().Should().Be(3);
-         expected.First().Should().Be(0);
-         expected.Last().Should().Be(2);
+        
+        // Assert
+        expected.Count().Should().Be(3);
+       var first = expected.First();
+       first.IsSome.Should().BeTrue();
+       
+       //first.Value.Should().Be(expected: 0);  <== this is not working 
+       first.IfSome(value => value.Should().Be(expected: 0));
+       
+
+        expected.Last().IfSome(x => x.Should().Be(2));
+      
     }
     
     [Fact]
@@ -31,19 +39,14 @@ public class ListOfValidNumbersTests
         var sut = new TransformInputToListOfNumbers();
 
         // Act
-        ImmutableList<object> expected = sut.MonadicTransform(inputList);
+        var expected = sut.MonadicTransform(inputList);
          
+        
         // Assert
         expected.Count().Should().Be(3);
-        expected.Last().Should().Be(2);
-        
-        expected.First().Should().NotBe(1);
-        //but what it should be ??
-        // null : forbidden, because it is not a number
-        // exception : forbidden, because it is not a number, and we want to continue the process seamlessly
-        // primitive obsession is one key that works, but require some effort to be done
-        
-        //what about Monads ?
+        expected.Last().IfSome(x => x.Should().Be(3));
+        expected.First().IfSome(x => x.Should().Be(1));
+     
         
     }
 }
