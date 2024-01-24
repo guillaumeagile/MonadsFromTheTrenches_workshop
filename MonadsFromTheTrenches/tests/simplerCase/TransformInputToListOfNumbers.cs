@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using LanguageExt;
+using static LanguageExt.Prelude;
 
 namespace MonadsFromTheTrenches.simplerCase;
 
@@ -10,12 +11,19 @@ public class TransformInputToListOfNumbers
         throw new NotImplementedException();
     }
 
-    public ImmutableList<Option<int>> MonadicTransform(ImmutableList<string> thatList)
+    public ImmutableList<Option<int>> MonadicTransform0(ImmutableList<string> thatList)
     {
         return thatList
-            .Select(item =>
-                    transformStringIntoOptionOfInt(item))
+            .Select(transformStringIntoOptionOfInt)
             .ToImmutableList();
+    }
+    
+    public ImmutableList<Option<int>> MonadicTransform(ImmutableList<string> thatList)
+    {
+       var seq =  thatList.ToSeq();
+       var res =  seq.Map(transformStringIntoOptionOfInt);
+       return res.ToImmutableList();
+       
     }
 
     private static Option<int> transformStringIntoOptionOfInt(string item)
