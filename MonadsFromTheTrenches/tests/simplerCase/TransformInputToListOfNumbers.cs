@@ -22,7 +22,11 @@ public class TransformInputToListOfNumbers
             }
             else
             {
-                temp.Add(Option<int>.Some(int.Parse(s: item)));
+                var result = int.TryParse(item, out var value) ;
+                if (result)
+                    temp.Add(Option<int>.Some(value));
+                else
+                    temp.Add(Option<int>.None);
             }
         }
         
