@@ -11,7 +11,7 @@ public class ListOfValidNumbersTests
     private ImmutableList<string> thatList = ImmutableList<string>.Empty;
     
     [Fact]
-    public void ReadOneMovieFromRawString_HappyPath()
+    public void ReadFromRawString_HappyPath()
     {
         // Arrange
         var inputList =  thatList.Add("0").Add("1").Add("2");
@@ -32,7 +32,7 @@ public class ListOfValidNumbersTests
     }
     
     [Fact]
-    public void ReadOneMovieFromRawString_UnHappyPath()
+    public void ReadFromRawString_UnHappyPath()
     {
         // Arrange
         var inputList =  thatList.Add(null).Add("2").Add("3");
@@ -49,7 +49,7 @@ public class ListOfValidNumbersTests
     }
     
     [Fact]
-    public void ReadOneMovieFromRawString_UnHappyPath_emptystring()
+    public void ReadFromRawString_UnHappyPath_emptystring()
     {
         // Arrange
         var inputList =  thatList.Add("").Add("2").Add("3");
@@ -66,7 +66,7 @@ public class ListOfValidNumbersTests
     }
     
     [Fact]
-    public void ReadOneMovieFromRawString_UnHappyPath_invalidNumber()
+    public void ReadFromRawString_UnHappyPath_invalidNumber()
     {
         // Arrange
         var inputList =  thatList.Add("Z").Add("2").Add("3");
@@ -85,7 +85,7 @@ public class ListOfValidNumbersTests
     //  exemple de FILTER
     
     [Fact]
-    public void ReadOneMovieFromRawString_HappyPath_Filter()
+    public void ReadFromRawString_HappyPath_Filter()
     {
         // Arrange
         var inputList =  thatList.Add("0").Add("1").Add("2").Add("A");
@@ -156,8 +156,11 @@ public class ListOfValidNumbersTests
         expected.Last().IfLeft(error => error.kindOfError.Should().Be(KindOfError.INVALID_NUMBER));
         expected.Last().IfLeft(error => error.OriginalInput.Should().Be("A"));
 
-        // TODO : on ne pourra écrire ceci que si on sait l'écrire avec la Monade seule (sans la liste)
-        // var res = expected.Map(x => x.Map( w => w + 1));
+        // TODO : on ne pourra écrire ceci que si on sait écrire MAP avec la Monade seule (sans la liste)
+         var res = expected.Map(x => x.Map( w => w + 1));
+         var oooh =expected.BiMapT(
+                Right: x => x + 1,
+                Left: e => e);
         // tester ce qui en ressort est interessant
 
     }
