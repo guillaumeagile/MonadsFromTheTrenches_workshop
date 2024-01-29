@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using LanguageExt;
+using LanguageExt.Common;
 using static LanguageExt.Prelude;
 
 namespace MonadsFromTheTrenches.simplerCase;
@@ -33,4 +34,28 @@ public class TransformInputToListOfNumbers
     }
     // DISCUSSION: Make Illegal States Unrepresentable!
     // Always Valid Pattern
+    
+   public static Either<OurError, int> TransformStringToEitherInt(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+            return Either<OurError, int>.Left(new OurError(KindOfError.EMPTY_STRING, input));
+        
+        return int.TryParse(input, out var value)? Either<OurError, int>.Right(value) : Either<OurError, int>.Left(new OurError(KindOfError.INVALID_NUMBER, input));
+        
+    }
+    
+    
+    public ImmutableList<Either<OurError, int>> MonadicTransformToEither(ImmutableList<string> inputList)
+    {
+        return inputList.Map(TransformStringToEitherInt).ToImmutableList();
+    }
+}
+
+public record OurError(KindOfError kindOfError, string OriginalInput);
+
+
+public enum KindOfError
+{
+    EMPTY_STRING,
+    INVALID_NUMBER
 }
