@@ -105,7 +105,7 @@ public class ListOfValidNumbersTests
     // et de REDUCE
     
     
-    // étape pédagogique: étudions EITHER
+    // étape pédagogique: étudions EITHER tout seul 
    // Erreur ou Valide ?
     // on veut savoir la nature de l'erreur: chaine vide? ou chaine invalide?
     [Fact]
@@ -113,11 +113,18 @@ public class ListOfValidNumbersTests
     {
         var actual = TransformInputToListOfNumbers.TransformStringToEitherInt("0");
         actual.IsRight.Should().BeTrue();
-        actual.IfRight( x => x.Should().Be(0));
-        // TODO     // utiliser MAP sur Either et voir que Map ne s'applique à DROITE
-        var afterMap = actual.Map(x => x + 1);
+        actual.IfRight( x => x.Should().Be(0));      
     }
     
+    [Fact]
+    public void TestTransformStringToEitherInt_SuccessRight_MapNewOperation()
+    {
+        var actual = TransformInputToListOfNumbers.TransformStringToEitherInt("0");
+    
+        var afterMap = actual.Map(x => x + 1);
+        afterMap.IsRight.Should().BeTrue();
+        afterMap.IfRight(x => x.Should().Be(1));
+    }
     
     [Fact]
     public void TestTransformStringToEitherInt()
@@ -125,8 +132,18 @@ public class ListOfValidNumbersTests
         var actual = TransformInputToListOfNumbers.TransformStringToEitherInt("");
         actual.IsLeft.Should().BeTrue();
         actual.IfLeft(error => error.kindOfError.Should().Be(KindOfError.EMPTY_STRING));
-        // TODO     // utiliser MAP sur Either et voir que Map ne s'applique à DROITE
+      
+    }
+    
+    [Fact]
+    public void TestTransformStringToEitherInt_EmptyString_MapNewFonction()
+    {
+        var actual = TransformInputToListOfNumbers.TransformStringToEitherInt("");
+     
         var afterMap = actual.Map(x => x + 1);
+        
+        afterMap.IsLeft.Should().BeTrue();
+        afterMap.IfLeft(error => error.kindOfError.Should().Be(KindOfError.EMPTY_STRING));
     }
     
     [Fact]
@@ -135,9 +152,21 @@ public class ListOfValidNumbersTests
         var actual = TransformInputToListOfNumbers.TransformStringToEitherInt("A");
         actual.IsLeft.Should().BeTrue();
         actual.IfLeft(error => error.kindOfError.Should().Be(KindOfError.INVALID_NUMBER));
-        //TODO     // utiliser MAP sur Either et voir que Map ne s'applique à DROITE
-        var afterMap = actual.Map(x => x + 1);
     }
+    
+    [Fact]
+    public void TestTransformStringToEitherInt_InvalidNumer_ChangeLeft()
+    {
+        var actual = TransformInputToListOfNumbers.TransformStringToEitherInt("A");
+         
+        var afterMap = actual.BiMap(
+            Right: (x) => x ,
+            Left: err => new OurError(KindOfError.EMPTY_STRING, err.OriginalInput));
+        
+        afterMap.IsLeft.Should().BeTrue();
+        afterMap.IfLeft(error => error.kindOfError.Should().Be(KindOfError.EMPTY_STRING));
+    }
+
     
     [Fact]
     public void fromListWithIllegalTerms_To_Etiher_WithMessage_EmptyString()

@@ -41,7 +41,6 @@ public class TransformInputToListOfNumbers
             return Either<OurError, int>.Left(new OurError(KindOfError.EMPTY_STRING, input));
         
         return int.TryParse(input, out var value)? Either<OurError, int>.Right(value) : Either<OurError, int>.Left(new OurError(KindOfError.INVALID_NUMBER, input));
-        
     }
     
     
