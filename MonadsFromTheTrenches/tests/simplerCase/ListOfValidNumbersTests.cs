@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using FluentAssertions;
+using LanguageExt;
 using MonadsFromTheTrenches.simplerCase;
 using Xunit;
 using static LanguageExt.Prelude;
@@ -184,17 +185,40 @@ public class ListOfValidNumbersTests
         expected.First().IfLeft(error => error.kindOfError.Should().Be(KindOfError.EMPTY_STRING));
         expected.Last().IfLeft(error => error.kindOfError.Should().Be(KindOfError.INVALID_NUMBER));
         expected.Last().IfLeft(error => error.OriginalInput.Should().Be("A"));
-
-        // TODO : on ne pourra écrire ceci que si on sait écrire MAP avec la Monade seule (sans la liste)
-         var res = expected.Map(x => x.Map( w => w + 1));
-         var oooh =expected.BiMapT(
-                Right: x => x + 1,
-                Left: e => e);
-        // tester ce qui en ressort est interessant
-
+        expected[1].IfRight(x => x.Should().Be(2));
     }
     
-    //TODO+++: peut on passer d'une monade à une autre monade?
+    [Fact]
+    public void fromListWithIllegalTerms_To_Etiher_WithMessage_EmptyString_Map()
+    {
+        // Arrange
+        var inputList =  thatList.Add("").Add("5").Add("A");
+        var sut = new TransformInputToListOfNumbers();
+
+        // Act
+        var expected = sut.MonadicTransformToEither(inputList);
+        
+        var afterMap = expected.Map( x => x.Map( z => z + 1));
+        
+        afterMap.First().IsLeft.Should().BeTrue();
+        afterMap.ToList()[1].IfRight(x => x.Should().Be(6));
+        afterMap.Last().IfLeft(error => error.kindOfError.Should().Be(KindOfError.INVALID_NUMBER));
+        
+        
+        var afterBiMapT =expected.BiMapT(
+            Right: x => x + 1,
+            Left: e => e);
+        // tester ce qui en ressort est interessant
+        afterBiMapT.First().IsLeft.Should().BeTrue();
+        afterBiMapT.ToList()[1].IfRight(x => x.Should().Be(6));
+        afterBiMapT.Last().IfLeft(error => error.kindOfError.Should().Be(KindOfError.INVALID_NUMBER));
+    }
+    
+    // TODO:   et maintenant Bind, travailler sur le cas de l'erreur , par exemple l'enregistrer
+    
+    
+    
+    // TODO+++: peut on passer d'une monade à une autre monade?
     
     // TODO ++++ =  montrer la Validation 
 }
