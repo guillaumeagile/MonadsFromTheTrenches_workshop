@@ -56,5 +56,6 @@ public record OurError(KindOfError kindOfError, string OriginalInput);
 public enum KindOfError
 {
     EMPTY_STRING,
-    INVALID_NUMBER
+    INVALID_NUMBER,
+    NEGATIVE_ERROR
 }

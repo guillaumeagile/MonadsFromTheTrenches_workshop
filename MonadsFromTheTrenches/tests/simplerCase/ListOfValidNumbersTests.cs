@@ -204,7 +204,6 @@ public class ListOfValidNumbersTests
         afterMap.ToList()[1].IfRight(x => x.Should().Be(6));
         afterMap.Last().IfLeft(error => error.kindOfError.Should().Be(KindOfError.INVALID_NUMBER));
         
-        
         var afterBiMapT =expected.BiMapT(
             Right: x => x + 1,
             Left: e => e);
@@ -215,10 +214,30 @@ public class ListOfValidNumbersTests
     }
     
     // TODO:   et maintenant Bind, travailler sur le cas de l'erreur , par exemple l'enregistrer
+    [Fact]
+    public void test_todo()
+    {
+        // Arrange
+        var actual = TransformInputToListOfNumbers.TransformStringToEitherInt("-1");
+
+        var expected = actual.Bind(funValidateOnlyPositive);
+
+        expected.IsLeft.Should().BeTrue();
+        expected.IfLeft(err => err.kindOfError.Should().Be(KindOfError.NEGATIVE_ERROR));
+    }
+
+    private Either<OurError, int> funValidateOnlyPositive(int arg)
+    {
+        throw new NotImplementedException();
+    }
+    // TODO ++++ =  montrer la Validation 
     
-    
-    
+    // TODO ++++ =  montrer  qu'on veut faire une operation type Log ou Print -> effet de bord
+
     // TODO+++: peut on passer d'une monade à une autre monade?
     
-    // TODO ++++ =  montrer la Validation 
+
 }
+
+// on peut aussi regarder un tutoriel github
+// https://github.com/stumathews/UnderstandingLanguageExt
