@@ -248,6 +248,19 @@ public class ListOfValidNumbersTests
         expected.IfLeft(err => err.kindOfError.Should().Be(KindOfError.TOO_BIG));
     }
     
+    [Fact]
+    public void Bind_List_Validation_Happy()
+    {
+        // Arrange
+        var inputList =  thatList.Add("Z").Add("2").Add("3");
+        var sut = new  TransformInputToListOfNumbers();
+        var actual = sut.MonadicTransformToEither(inputList);
+        var expected = actual.BindT(funValidateOnlyPositive);
+        
+        expected.IsRight.Should().BeTrue();
+        expected.IfRight(x => x.Should().Be(1));
+    }
+    
 
     private Either<OurError, int> funValidateOnlyPositive(int arg)
     {
