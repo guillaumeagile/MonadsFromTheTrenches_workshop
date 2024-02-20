@@ -57,5 +57,6 @@ public enum KindOfError
 {
     EMPTY_STRING,
     INVALID_NUMBER,
-    NEGATIVE_ERROR
+    NEGATIVE_ERROR,
+    TOO_BIG
 }

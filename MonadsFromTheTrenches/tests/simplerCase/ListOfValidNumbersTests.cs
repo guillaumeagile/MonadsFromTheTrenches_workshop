@@ -236,12 +236,27 @@ public class ListOfValidNumbersTests
         expected.IsRight.Should().BeTrue();
         expected.IfRight(x => x.Should().Be(1));
     }
+    
+    [Fact]
+    public void Bind_Validation_TooBig()
+    {
+        // Arrange
+        var actual = TransformInputToListOfNumbers.TransformStringToEitherInt("101");
+        var expected = actual.Bind(funValidateOnlyPositive);
+        
+        expected.IsLeft.Should().BeTrue();
+        expected.IfLeft(err => err.kindOfError.Should().Be(KindOfError.TOO_BIG));
+    }
+    
 
     private Either<OurError, int> funValidateOnlyPositive(int arg)
     {
-        return (arg < 0)
-            ? Either<OurError, int>.Left(new OurError(KindOfError.NEGATIVE_ERROR, arg.ToString()))
-            : Either<OurError, int>.Right(arg);
+        return arg switch
+        {
+            < 0 => Either<OurError, int>.Left(new OurError(KindOfError.NEGATIVE_ERROR, arg.ToString())),
+            > 100 => Either<OurError, int>.Left(new OurError(KindOfError.TOO_BIG, arg.ToString())),
+            _ => Either<OurError, int>.Right(arg)
+        };
     }
     
     // TODO ++++ =  montrer la Validation 
