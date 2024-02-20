@@ -215,7 +215,7 @@ public class ListOfValidNumbersTests
     
     // TODO:   et maintenant Bind, travailler sur le cas de l'erreur , par exemple l'enregistrer
     [Fact]
-    public void test_todo()
+    public void Bind_Validation_Unhappy()
     {
         // Arrange
         var actual = TransformInputToListOfNumbers.TransformStringToEitherInt("-1");
@@ -226,13 +226,29 @@ public class ListOfValidNumbersTests
         expected.IfLeft(err => err.kindOfError.Should().Be(KindOfError.NEGATIVE_ERROR));
     }
 
+    [Fact]
+    public void Bind_Validation_Happy()
+    {
+        // Arrange
+        var actual = TransformInputToListOfNumbers.TransformStringToEitherInt("+1");
+        var expected = actual.Bind(funValidateOnlyPositive);
+        
+        expected.IsRight.Should().BeTrue();
+        expected.IfRight(x => x.Should().Be(1));
+    }
+
     private Either<OurError, int> funValidateOnlyPositive(int arg)
     {
-        throw new NotImplementedException();
+        return (arg < 0)
+            ? Either<OurError, int>.Left(new OurError(KindOfError.NEGATIVE_ERROR, arg.ToString()))
+            : Either<OurError, int>.Right(arg);
     }
+    
     // TODO ++++ =  montrer la Validation 
     
     // TODO ++++ =  montrer  qu'on veut faire une operation type Log ou Print -> effet de bord
+    
+    // TODO: une operation finale pour produire un HTTP Response et l'assemblage des opérations
 
     // TODO+++: peut on passer d'une monade à une autre monade?
     
