@@ -27,12 +27,12 @@ public static class TakeCareOfCats
 
     // ------------- soluces -----------------
     
-    public static IEnumerable<Either<Error, Cat>> FeedSchrödingerCats_Sol(this ImmutableList<Either<Error, Cat>> inputList, int i, Func<Cat, Cat> CatTakesWeightPlus2 )
+    public static IEnumerable<Either<Error, Cat>> FeedSchrödingerCats_Sol(this ImmutableList<Either<Error, Cat>> inputList, int i, Func<Cat, Cat> CatTakesWeightPlus1 )
     {
         var res1 = inputList.Map(cat => cat.Map(c => new Cat(c.Name, c.Age, c.Weight + i)));
         
         IEnumerable<Either<Error, Cat>> res2 = from cat in inputList
-            select cat.Map(c => new Cat(c.Name, c.Age, c.Weight + i));
+            select cat.Map(c => CatTakesWeight( i, c));
 
         var seq = inputList.ToSeq();
             
@@ -41,16 +41,13 @@ public static class TakeCareOfCats
             e => e);
         
         var res4 = seq.BiMapT(
-            cat =>  CatTakesWeightPlus2,
+            cat =>  CatTakesWeightPlus1,
             e => e);
         
         return res3;
     }
 
-    private static RRet CatTakesWeight2<RRet>(Cat cat)
-    {
-        throw new NotImplementedException();
-    }
+   
 
     private static Cat CatTakesWeight(int i, Cat cat)
     {
