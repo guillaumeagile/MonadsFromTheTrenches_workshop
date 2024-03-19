@@ -30,4 +30,6 @@ public class MaybeTest
             Some: value => value.Should().Be(expected: 0), 
             None: () => Assert.Fail(message: "no no no"));
     }
+    
+    // and now... with Cat
 }

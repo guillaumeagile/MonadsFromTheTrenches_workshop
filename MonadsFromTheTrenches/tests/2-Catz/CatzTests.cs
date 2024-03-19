@@ -37,22 +37,78 @@ public class CatzTests
         // Arrange
         var box = Either<Error, Cat>.Right(new Cat("Fluffy", 8, 10));
 
+        box.IsRight.Should().BeFalse();
+        
+        // now try to make it left/wrong
+        
+        box.IsLeft.Should().BeFalse();
 
+        // !! 🤪 !! for the rest of the demo, we will alternate between right and left
+        
         // Act
-        var expected = box.Bind(AlloMamanBobo);
-        // Assert
+        //  //Validate, Extract, Transform, lift
+        var expectOlder = box.Map( c => c );
+        expectOlder.IfRight( c => c.Age.Should().Be(9));
 
+        return;
+        
+        
+
+        //  //Validate, Extract, Transform+, lift
+        var expected = box.Bind(GetsOlderIfNotTooOld);
+
+        
+        
+        
+        var expectMapped = box.Map(transformToDog);
+
+
+        
+        
+        var expectedBindAndhange = box.Bind(OldCatBecomesDog);
+        
+        
+        
+        
+        
+        // Assert
         var expected2 = box.Apply(SorsDeLaVilainMatou);
+        
+        
+        
+        
+        
+        var expected3 = box.Apply(Shazzam);
+        
+        
+        
+        
+    }
+
+    private Dog transformToDog(Cat arg) //Map
+    {
+        throw new NotImplementedException();
     }
 
 
-    private Either<Error, Cat> AlloMamanBobo(Cat arg)
+    private Either<Error, Cat> GetsOlderIfNotTooOld(Cat arg) //Bind
     {
         if (arg.Age > 7) return Either<Error, Cat>.Left(new MyError("TOO_OLD"));
-        return arg;
+        return arg with { Age = arg.Age + 1 };
+    }
+    
+    private Either<Error, Dog> OldCatBecomesDog(Cat arg) //Bind
+    {
+        if (arg.Age > 7) return Either<Error, Dog>.Left(new MyError("TOO_OLD_TO_BECOME_DOG"));
+        return new Dog( Name : arg.Name + " woof!");
     }
 
-    private Cat SorsDeLaVilainMatou(Either<Error, Cat> arg)
+    private Cat SorsDeLaVilainMatou(Either<Error, Cat> arg) //Apply
+    {
+        throw new NotImplementedException();
+    }
+    
+    private Dog Shazzam(Either<Error, Cat> arg) //Apply
     {
         throw new NotImplementedException();
     }
@@ -144,22 +200,36 @@ public class CatzTests
         throw new NotImplementedException();
     }
 
-
-    private Seq<Either<Error, Cat>> SaveTheContentOfTheBox(Either<Error, Cat> arg)
+    private Seq<Either<Error, Cat>> SaveTheContentOfTheBox(Either<Error, Cat> arg) //Bind
     {
         return new Seq<Either<Error, Cat>>().Add(arg);
     }
 
-    private int doSomethingElse(Seq<ActionResult> arg)
+    private int doSomethingElse(Seq<ActionResult> arg)  //Apply
     {
         throw new NotImplementedException();
     }
 
-    private IEnumerable<int> doSomething(ActionResult arg)
+    private IEnumerable<int> doSomething(ActionResult arg) //Bind
     {
         yield return 1;
     }
 }
+
+/*
+ *  private Either<Error, Cat> GetsOlderIfNotTooOld(Cat arg) //Bind
+   {
+   if (arg.Age > 7) return Either<Error, Cat>.Left(new MyError("TOO_OLD"));
+   return arg with { Age = arg.Age + 1 };
+   }
+   
+   private Either<Error, Dog> OldCatBecomesDog(Cat arg) //Bind
+   {
+   if (arg.Age > 7) return Either<Error, Dog>.Left(new MyError("TOO_OLD_TO_BECOME_DOG"));
+   return new Dog( Name : arg.Name + " woof!");
+   }
+ * 
+ */
 
 public record MyError : Error
 {

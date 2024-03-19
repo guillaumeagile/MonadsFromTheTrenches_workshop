@@ -28,7 +28,9 @@ public static class TakeCareOfCats
     // ------------- soluces -----------------
     
     public static IEnumerable<Either<Error, Cat>> FeedSchrödingerCats_Sol(this ImmutableList<Either<Error, Cat>> inputList, int i, Func<Cat, Cat> CatTakesWeightPlus1 )
-    {
+    { 
+        // Map is doing VETL
+        //Validate, Extract, Transform, lift
         var res1 = inputList.Map(cat => cat.Map(c => new Cat(c.Name, c.Age, c.Weight + i)));
         
         IEnumerable<Either<Error, Cat>> res2 = from cat in inputList
