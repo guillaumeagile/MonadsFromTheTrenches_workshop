@@ -11,31 +11,13 @@ public class CatzTests
 {
     private readonly ImmutableList<Cat> thatList = ImmutableList<Cat>.Empty;
 
-    [Fact]
-    public void ListOfNiceCats()
-    {
-        // Arrange
-        var inputList = thatList
-            .Add(new Cat("Fluffy", 8, 10))
-            .Add(new Cat("Mittens", 5, 7))
-            .Add(new Cat("Garfield", 7, 18));
-
-        // Act
-        var expected = TakeCareOfCats.FeedCats(inputList, 1);
-
-        // Assert
-        expected.Count().Should().Be(3);
-        expected.First().Name.Should().Be("Fluffy");
-        expected.First().Weight.Should().Be(11);
-        expected.Last().Name.Should().Be("Garfield");
-        expected.Last().Weight.Should().Be(19);
-    }
+   
 
     [Fact]
     public void MakeOneSchrödingerCats()
     {
-        // Arrange
-        var box = Either<Error, Cat>.Right(new Cat("Fluffy", 8, 10));
+            // Arrange
+            var box = Either<Error, Cat>.Right(new Cat("Fluffy", 8, 10));
 
         box.IsRight.Should().BeFalse();
         
@@ -46,19 +28,26 @@ public class CatzTests
         // !! 🤪 !! for the rest of the demo, we will alternate between right and left
         
         // Act
-        //  //Validate, Extract, Transform, lift
+        //  //Validate, Extract, Transform, lift (if valid)
         var expectOlder = box.Map( c => c );
         expectOlder.IfRight( c => c.Age.Should().Be(9));
-
+        
+        // First, there is no difference between Map and Select.
+        
         return;
         
-        
+                //Map and Bind do much the same, however they differ only in how they return the transformed result i.e. the Lift/leave phase.
+                //In all cases the transformation function is run, however the requirements of the transformation's functions arguments
+                //and return type have changed:
 
         //  //Validate, Extract, Transform+, lift
         var expected = box.Bind(GetsOlderIfNotTooOld);
 
         
+        //Bind requires the programmer to define and provide a transformation function that will take as input the item provided to it by the Bind function,
+        //but crucially it needs to transform it in such a way that the result is a new instance of the Monad
         
+        //while Map, only requires the transformation function to return the transformation from TA to TB without needing to place it into a new Box<TB>.
         
         var expectMapped = box.Map(transformToDog);
 
@@ -71,7 +60,7 @@ public class CatzTests
         
         
         
-        // Assert
+        // The so-called “applicative” style uses functions such as apply, 
         var expected2 = box.Apply(SorsDeLaVilainMatou);
         
         
@@ -84,6 +73,7 @@ public class CatzTests
         
         
     }
+    
 
     private Dog transformToDog(Cat arg) //Map
     {
@@ -93,14 +83,12 @@ public class CatzTests
 
     private Either<Error, Cat> GetsOlderIfNotTooOld(Cat arg) //Bind
     {
-        if (arg.Age > 7) return Either<Error, Cat>.Left(new MyError("TOO_OLD"));
-        return arg with { Age = arg.Age + 1 };
+        throw new NotImplementedException();
     }
     
     private Either<Error, Dog> OldCatBecomesDog(Cat arg) //Bind
     {
-        if (arg.Age > 7) return Either<Error, Dog>.Left(new MyError("TOO_OLD_TO_BECOME_DOG"));
-        return new Dog( Name : arg.Name + " woof!");
+        throw new NotImplementedException();
     }
 
     private Cat SorsDeLaVilainMatou(Either<Error, Cat> arg) //Apply
@@ -113,142 +101,26 @@ public class CatzTests
         throw new NotImplementedException();
     }
 
-
     [Fact]
-    public void MakeListOfSchrödingerCats()
+    public void FullProcessOneSchrödingerCats()
     {
         // Arrange
-        var inputList = thatList
-            .Add(new Cat("Fluffy", 8, 10))
-            .Add(new Cat("Mittens", 5, 7))
-            .Add(new Cat("Garfield", 7, 18));
+        // on a recu le chat depuis une fenetre web (DTO)
+        var inputBox = Either<Error, Cat>.Right(new Cat("Fluffy", 8, 10));
 
+        // var validated = inputBox.Bind(validate);
+        
+        // var readyToBeSaved = validated.Map(transformToDTO);
+        
+        // var saved = readyToBeSaved.Bind(save);
+        
+        // var httpResponse = saved.BiMap(transformToHttpResponse);
+        
+        // httpResponse.Match( Right: x => x, Left: x => x);
 
-        // Act
-        var expected = inputList.SchrödingerCats();
-
-        // Assert
     }
 
-    [Fact]
-    public void FeedListOfSchrödingerCats()
-    {
-        // Arrange
-        var inputList = thatList
-            .Add(new Cat("Fluffy", 8, 9))
-            .Add(new Cat("Mittens", 5, 7))
-            .Add(new Cat("Garfield", 7, 17));
 
-        var sut = inputList.SchrödingerCats();
+    
 
-        // Act
-        var expected = sut.FeedSchrödingerCats(1);
-
-        // Assert
-        // tous les chats on prit +1
-        expected.Sum(box => box.Fold(
-                0,
-                (i, c) => i + c.Weight)
-            )
-            .Should().Be(9 + 1 + 7 + 1 + 17 + 1);
-    }
-
-    [Fact]
-    public void FeedListOfSchrödingerCats_OnlyIfWeightInferiorStrict10_withError()
-    {
-        // Arrange
-        var inputList = thatList
-            .Add(new Cat("Fluffy", 8, 10))
-            .Add(new Cat("Mittens", 5, 7))
-            .Add(new Cat("Garfield", 7, 18));
-
-        var sut = inputList.SchrödingerCats();
-
-        // Act
-        var expected = sut.FeedSchrödingerCats(1);
-
-        // Assert
-        expected.ToArr().Sum(box => box.BiFold(
-                0,
-                (i, c) => i,
-                (i, err) => i + 1))
-            .Should().Be(1 + 1);
-
-        var unused = expected.ToSeq();
-        var k = unused.Bind(SaveTheContentOfTheBox);
-        var kk = unused.Apply(SaveTheContentOfAllTheBoxes);
-
-        var z = expected.ToSeq().Map(
-            box => box
-                .Match(
-                    cat => new OkObjectResult(cat),
-                    err => (ActionResult)new BadRequestObjectResult(err))
-        );
-
-        var t = z.Bind(doSomething);
-        var u = z.Apply(doSomethingElse);
-
-        var zz = expected.ToArr().MapLeftT(
-                err => (ActionResult)new BadRequestObjectResult(err))
-            ;
-        var zzTop = zz.Map(box => box.Map(cat => (ActionResult)new OkObjectResult(cat)));
-        var finish = zzTop.Match(x => x, x => x);
-    }
-
-    private Either<Error, Cat> SaveTheContentOfAllTheBoxes(Seq<Either<Error, Cat>> arg)
-    {
-        throw new NotImplementedException();
-    }
-
-    private Seq<Either<Error, Cat>> SaveTheContentOfTheBox(Either<Error, Cat> arg) //Bind
-    {
-        return new Seq<Either<Error, Cat>>().Add(arg);
-    }
-
-    private int doSomethingElse(Seq<ActionResult> arg)  //Apply
-    {
-        throw new NotImplementedException();
-    }
-
-    private IEnumerable<int> doSomething(ActionResult arg) //Bind
-    {
-        yield return 1;
-    }
-}
-
-/*
- *  private Either<Error, Cat> GetsOlderIfNotTooOld(Cat arg) //Bind
-   {
-   if (arg.Age > 7) return Either<Error, Cat>.Left(new MyError("TOO_OLD"));
-   return arg with { Age = arg.Age + 1 };
-   }
-   
-   private Either<Error, Dog> OldCatBecomesDog(Cat arg) //Bind
-   {
-   if (arg.Age > 7) return Either<Error, Dog>.Left(new MyError("TOO_OLD_TO_BECOME_DOG"));
-   return new Dog( Name : arg.Name + " woof!");
-   }
- * 
- */
-
-public record MyError : Error
-{
-    public MyError(string reason) : base(reason)
-    {
-    }
-
-    public override string Message { get; }
-    public override bool IsExceptional { get; }
-    public override bool IsExpected { get; }
-
-
-    public override bool Is<E>()
-    {
-        throw new NotImplementedException();
-    }
-
-    public override ErrorException ToErrorException()
-    {
-        throw new NotImplementedException();
-    }
 }
